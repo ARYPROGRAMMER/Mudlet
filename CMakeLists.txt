@@ -146,6 +146,24 @@ include_optional_module(ENVIRONMENT_VARIABLE WITH_OWN_QTKEYCHAIN
 include_optional_module(ENVIRONMENT_VARIABLE WITH_QT6
                         OPTION_VARIABLE USE_QT6
                         READABLE_NAME "build with Qt6 (if installed)")
+include_optional_module(ENVIRONMENT_VARIABLE WITH_CRASH_REPORTING
+                        OPTION_VARIABLE USE_CRASH_REPORTING
+                        READABLE_NAME "crash reporting with Sentry.io"
+                        SUPPORTED_SYSTEMS "Linux"
+                                        "Windows"
+                                        "Darwin")
+if(USE_CRASH_REPORTING)
+# Find Sentry package
+  find_package(Sentry REQUIRED)
+
+  # Add compile definitions
+  add_definitions(-DWITH_CRASH_REPORTING)
+
+  # Set Sentry version
+  set(SENTRY_VERSION "0.6.7" CACHE STRING "Sentry SDK version")
+
+  message(STATUS "Building with Sentry crash reporting support (version ${SENTRY_VERSION})")
+endif()
 
 if(USE_QT6)
   find_package(

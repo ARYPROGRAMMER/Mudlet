@@ -211,6 +211,52 @@ bool TLuaInterpreter::getVerifiedBool(lua_State* L, const char* functionName, co
     Q_UNREACHABLE();
 }
 
+
+
+void TLuaInterpreter::initializeSentry(bool enabled)
+{
+    if (enabled) {
+        CrashHandler::instance().initialize();
+    }
+    CrashHandler::instance().setUserConsent(enabled);
+}
+
+void TLuaInterpreter::setCrashReportingEnabled(bool enabled)
+{
+    CrashHandler::instance().setUserConsent(enabled);
+    
+    // Save setting
+    QSettings settings;
+    settings.setValue("crashReportingEnabled", enabled);
+}
+
+bool TLuaInterpreter::isCrashReportingEnabled()
+{
+    return CrashHandler::instance().hasUserConsent();
+}
+
+void TLuaInterpreter::sentryCaptureMessage(const QString& message, const QString& level)
+{
+    if (!CrashHandler::instance().hasUserConsent()) {
+        return;
+    }
+    
+    if (level.toLower() == "error") {
+        CrashHandler::instance().captureError(message);
+    } else {
+        CrashHandler::instance().captureMessage(message);
+    }
+}
+
+void TLuaInterpreter::sentryCaptureError(const QString& error, const QString& info)
+{
+    if (!CrashHandler::instance().hasUserConsent()) {
+        return;
+    }
+    
+    CrashHandler::instance().captureError(error, info);
+}
+
 // No documentation available in wiki - internal function
 // See also: getVerifiedBool
 QString TLuaInterpreter::getVerifiedString(lua_State* L, const char* functionName, const int pos, const char* publicName, const bool isOptional)

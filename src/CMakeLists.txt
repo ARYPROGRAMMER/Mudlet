@@ -184,6 +184,35 @@ set(mudlet_SRCS
     XMLexport.cpp
     XMLimport.cpp)
 
+if(USE_CRASH_REPORTING)
+    list(APPEND mudlet_SRCS
+        CrashHandler.cpp
+        CrashReporter.cpp
+    )
+    
+    list(APPEND mudlet_HDRS
+        CrashHandler.h
+        CrashReporter.h
+    )
+endif()
+
+# Add to target_link_libraries
+if(USE_CRASH_REPORTING)
+    target_link_libraries(mudlet
+        PRIVATE
+            sentry::sentry
+    )
+endif()
+
+# Add compile definitions
+if(USE_CRASH_REPORTING)
+    target_compile_definitions(mudlet
+        PRIVATE
+            WITH_CRASH_REPORTING
+            SENTRY_BUILD_STATIC=1
+    )
+endif()
+
 if(APPLE)
   list(APPEND mudlet_SRCS AnnouncerMac.mm)
   # Sparkle updater for macOS

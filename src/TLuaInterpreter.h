@@ -724,6 +724,12 @@ public slots:
     void slot_purge();
     void slot_deleteSender(int, QProcess::ExitStatus);
 
+    void initializeSentry(bool enabled);
+    void setCrashReportingEnabled(bool enabled);
+    bool isCrashReportingEnabled();
+    void sentryCaptureMessage(const QString& message, const QString& level);
+    void sentryCaptureError(const QString& error, const QString& info);
+
 private:
     static bool getVerifiedBool(lua_State*, const char* functionName, const int pos, const char* publicName, const bool isOptional = false);
     static QString getVerifiedString(lua_State*, const char* functionName, const int pos, const char* publicName, const bool isOptional = false);

@@ -91,6 +91,9 @@
 #if defined(Q_OS_WIN32)
 #include <QSettings>
 #endif
+#ifdef WITH_CRASH_REPORTING
+#include "CrashHandler.h"
+#endif
 
 // We are now using code that won't work with really old versions of libzip;
 // some of the error handling was improved in 1.0 . Unfortunately libzip 1.7.0
@@ -138,7 +141,9 @@ bool TConsoleMonitor::eventFilter(QObject* obj, QEvent* event)
 
 mudlet::mudlet()
 : QMainWindow()
+, mCrashReportingEnabled(false)
 {
+    setupCrashReporting();
     // Initialisation happens later in setupConfig() and init()
 }
 
@@ -732,6 +737,19 @@ void mudlet::init()
 //            loadMaps();
 //        }
 //    });
+}
+
+void mudlet::setupCrashReporting()
+{
+#ifdef WITH_CRASH_REPORTING
+    QSettings settings;
+    mCrashReportingEnabled = settings.value("crashReportingEnabled", true).toBool();
+    
+    if (mCrashReportingEnabled) {
+        CrashHandler::instance().initialize();
+        CrashHandler::instance().setUserConsent(true);
+    }
+#endif
 }
 
 static QString findExecutableDir()

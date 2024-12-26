@@ -61,7 +61,20 @@ dlgProfilePreferences::dlgProfilePreferences(QWidget* pParentWidget, Host* pHost
 {
     // init generated dialog
     setupUi(this);
-
+#ifdef WITH_CRASH_REPORTING
+    // Set up crash reporting checkbox
+    mpCrashReportingCheckBox = new QCheckBox(tr("Enable crash reporting"));
+    mpCrashReportingCheckBox->setToolTip(tr("Send anonymous crash reports to help improve Mudlet"));
+    connect(mpCrashReportingCheckBox, &QCheckBox::toggled, this, &dlgProfilePreferences::slot_crashReportingChanged);
+    
+    // Load current setting
+    QSettings settings;
+    bool crashReportingEnabled = settings.value("crashReportingEnabled", true).toBool();
+    mpCrashReportingCheckBox->setChecked(crashReportingEnabled);
+    
+    // Add to layout
+    pageLayout->addWidget(mpCrashReportingCheckBox);
+#endif
     QPixmap holdPixmap;
 #if (QT_VERSION) >= (QT_VERSION_CHECK(5, 15, 0))
     holdPixmap = notificationAreaIconLabelWarning->pixmap(Qt::ReturnByValue);
@@ -1818,7 +1831,15 @@ void dlgProfilePreferences::setButtonAndProfileColor(QPushButton* button, QColor
         setButtonColor(button, color);
     }
 }
-
+#ifdef WITH_CRASH_REPORTING
+void dlgProfilePreferences::slot_crashReportingChanged(bool enabled)
+{
+    QSettings settings;
+    settings.setValue("crashReportingEnabled", enabled);
+    
+    CrashHandler::instance().setUserConsent(enabled);
+}
+#endif
 void dlgProfilePreferences::slot_setFgColor()
 {
     Host* pHost = mpHost;

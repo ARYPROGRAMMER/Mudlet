@@ -57,6 +57,14 @@
       </attribute>
       <layout class="QVBoxLayout" name="vBoxLayout_tab_general">
        <item>
+        <widget class="QCheckBox" name="crashReportingCheckBox">
+            <property name="text">
+            <string>Enable crash reporting</string>
+            </property>
+            <property name="toolTip">
+            <string>Send anonymous crash reports to help improve Mudlet</string>
+            </property>
+        </widget>
         <widget class="QGroupBox" name="groupBox_iconsAndToolbars">
          <property name="title">
           <string>Icon sizes</string>

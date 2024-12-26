@@ -97,6 +97,9 @@
 // Any other OS?
 #endif
 #include "post_guard.h"
+#ifdef WITH_CRASH_REPORTING
+#include "CrashHandler.h"
+#endif
 
 class QCloseEvent;
 class QMediaPlayer;
@@ -612,7 +615,10 @@ private slots:
 private:
     static bool desktopInDarkMode();
 
-
+    void setupCrashReporting();
+    #ifdef WITH_CRASH_REPORTING
+        bool mCrashReportingEnabled;
+    #endif
     void assignKeySequences();
     QString autodetectPreferredLanguage();
     void closeHost(const QString&);

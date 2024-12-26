@@ -174,7 +174,7 @@ private slots:
     void slot_changeLargeAreaExitArrows(const bool);
     void slot_hidePasswordMigrationLabel();
     void slot_loadHistoryMap();
-
+    void slot_crashReportingChanged(bool);
 signals:
     void signal_themeUpdateCompleted();
     void signal_preferencesSaved();
@@ -217,7 +217,7 @@ private:
     QPointer<QDoubleSpinBox> mpDoubleSpinBox_mapSymbolFontFudge;
     std::unique_ptr<QTimer> hidePasswordMigrationLabelTimer;
     QMap<QString, QKeySequence*> currentShortcuts;
-
+    QCheckBox* mpCrashReportingCheckBox;
     QString mLogDirPath;
     // Needed to remember the state on construction so that we can sent the same
     // flag back for Host::mUseSharedDictionary even if we turn-off
