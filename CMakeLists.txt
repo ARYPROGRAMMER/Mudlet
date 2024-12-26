@@ -124,6 +124,17 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(IncludeOptionalModule)
 
+include(FetchContent)
+FetchContent_Declare(
+    sentry_native
+    GIT_REPOSITORY https://github.com/getsentry/sentry-native.git
+    GIT_TAG        master
+)
+FetchContent_MakeAvailable(sentry_native)
+
+# Link Sentry to Mudlet
+target_link_libraries(Mudlet PRIVATE sentry)
+
 include_optional_module(ENVIRONMENT_VARIABLE WITH_UPDATER
                         OPTION_VARIABLE USE_UPDATER
                         READABLE_NAME "updater"
@@ -235,3 +246,6 @@ endif()
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE -O3)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG -O0)
+set(CRASHPAD_DIR "path/to/crashpad")
+include_directories(${CRASHPAD_DIR}/include)
+target_link_libraries(Mudlet PRIVATE ${CRASHPAD_DIR}/build/libcrashpad_client.a)

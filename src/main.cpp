@@ -46,9 +46,76 @@
 #include "TAccessibleTextEdit.h"
 #include "Announcer.h"
 #include "FileOpenHandler.h"
+#include <sentry.h>
+#include <mach-o/dyld.h>
 
 using namespace std::chrono_literals;
 
+void initSentryLINUX() {
+    // Create Sentry options
+    sentry_options_t *options = sentry_options_new();
+
+    // Set Sentry DSN
+    sentry_options_set_dsn(options, "https://<your-public-key>@<organization>.ingest.sentry.io/<project-id>");
+
+    // Set the path where Sentry will store crash information locally
+    sentry_options_set_database_path(options, "/tmp/sentry");
+
+    // Enable debug for local testing
+    sentry_options_set_debug(options, 1);
+
+    // Initialize Sentry
+    sentry_init(options);
+
+    // Optional: Attach additional data (tags, context)
+    sentry_set_tag("platform", "linux");
+    sentry_set_context("environment", sentry_value_new_string("development"));
+}
+
+
+void initSentryWINDOWS() {
+    sentry_options_t *options = sentry_options_new();
+
+    // Set Sentry DSN
+    sentry_options_set_dsn(options, "https://<your-public-key>@<organization>.ingest.sentry.io/<project-id>");
+
+    // Set database path for Windows
+    sentry_options_set_database_path(options, "C:\\Mudlet\\Sentry\\db");
+
+    // Enable debug mode
+    sentry_options_set_debug(options, 1);
+
+    // Windows-specific tag
+    sentry_set_tag("platform", "windows");
+
+    // Initialize Sentry
+    sentry_init(options);
+}
+
+void initSentryMAC() {
+    sentry_options_t *options = sentry_options_new();
+
+    // Set Sentry DSN
+    sentry_options_set_dsn(options, "https://<your-public-key>@<organization>.ingest.sentry.io/<project-id>");
+
+    // Set database path for macOS
+    sentry_options_set_database_path(options, "/Users/<username>/Library/Logs/Mudlet/Sentry");
+
+    // Enable debug mode
+    sentry_options_set_debug(options, 1);
+
+    // macOS-specific tag
+    sentry_set_tag("platform", "macos");
+
+    // Initialize Sentry
+    sentry_init(options);
+}
+
+
+void shutdownSentry() {
+    // Shutdown Sentry gracefully
+    sentry_close();
+}
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // Enable leak detection for MSVC debug builds. _DEBUG is MSVC specific and
@@ -258,6 +325,23 @@ int main(int argc, char* argv[])
     mudlet::start();
     // Detect config path before any files are read
     mudlet::self()->setupConfig();
+    try{
+    initSentryLINUX();
+    
+    }
+    catch(e){
+        try {
+            initSentryMAC();
+        }
+        catch(e){
+            try {
+                initSentryWINDOWS();
+            }
+            catch(e){
+                qDebug() << "Failed to initialize Sentry";
+            }
+        }
+    }
 
     QPointer<QTranslator> commandLineTranslator(loadTranslationsForCommandLine());
     QCommandLineParser parser;
